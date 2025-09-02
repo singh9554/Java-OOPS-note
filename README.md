@@ -1134,3 +1134,1076 @@ class PassingCurrentObjectDemo {
 
 These four concepts are fundamental to Java programming and are heavily used in frameworks like Spring Boot!
 
+---
+
+## Packages, Access Modifiers & Encapsulation - Complete Guide
+
+### 📦 Packages in Java
+
+**What is a Package?**
+A package is like a folder that groups related classes together. It's a way to organize your code and avoid naming conflicts.
+
+Real-world analogy: Think of your computer's file system - you organize files into folders. Similarly, Java organizes classes into packages.
+
+**Why Use Packages?**
+- **Organization:** Keep related classes together
+- **Name conflicts:** Two classes can have same name in different packages
+- **Access control:** Control which classes can access your code
+- **Easy maintenance:** Find and manage code easily
+
+#### 📁 Package Structure Examples:
+```java
+// Real Java packages structure:
+java.lang          // Core Java classes (String, Object, etc.)
+java.util          // Utility classes (ArrayList, HashMap, etc.)
+java.io            // Input/Output classes (File, Scanner, etc.)
+
+// Your project packages:
+com.company.project
+├── models/        // Classes representing data
+├── services/      // Business logic classes  
+├── controllers/   // User interface classes
+└── utils/         // Helper classes
+```
+
+#### 🔧 How to Create and Use Packages:
+
+**Creating a Package:**
+```java
+// File: com/library/models/Book.java
+package com.library.models;    // Package declaration (MUST be first line)
+
+public class Book {
+    private String title;
+    private String author;
+    
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+    }
+    
+    public String getTitle() {
+        return title;
+    }
+    
+    public String getAuthor() {
+        return author;
+    }
+    
+    public void displayInfo() {
+        System.out.println("Book: " + title + " by " + author);
+    }
+}
+```
+
+**Using Classes from Packages:**
+```java
+// File: com/library/main/LibraryMain.java
+package com.library.main;
+
+// Import specific class
+import com.library.models.Book;
+
+// Import all classes from package (not recommended)
+// import com.library.models.*;
+
+public class LibraryMain {
+    public static void main(String[] args) {
+        // Using imported class
+        Book book1 = new Book("Java Programming", "Oracle");
+        book1.displayInfo();
+        
+        // Using class with full package name (without import)
+        com.library.models.Book book2 = new com.library.models.Book("Python Guide", "Guido");
+        book2.displayInfo();
+    }
+}
+```
+
+**Package Naming Conventions:**
+```java
+// Company domain in reverse + project name
+com.google.android
+com.microsoft.office
+org.apache.commons
+
+// Your packages should follow this pattern:
+com.yourcompany.projectname.modulename
+com.library.management.models
+com.library.management.services
+```
+
+### 🔐 Access Modifiers
+
+**What are Access Modifiers?**
+Access modifiers control who can access your classes, methods, and variables. They set visibility rules.
+
+#### 4 Types of Access Modifiers:
+
+| Modifier | Same Class | Same Package | Subclass | Everywhere |
+|----------|------------|--------------|----------|------------|
+| private  | ✅         | ❌           | ❌       | ❌         |
+| default  | ✅         | ✅           | ❌       | ❌         |
+| protected| ✅         | ✅           | ✅       | ❌         |
+| public   | ✅         | ✅           | ✅       | ✅         |
+
+#### 📝 Detailed Examples:
+
+#### 1️⃣ Private Access Modifier
+```java
+// File: com/example/BankAccount.java
+package com.example;
+
+class BankAccount {
+    private double balance;        // Private - only accessible within this class
+    private String accountNumber;  // Private variable
+    
+    public BankAccount(String accountNumber, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.balance = initialBalance;
+    }
+    
+    // Private method - only accessible within this class
+    private boolean validateAmount(double amount) {
+        return amount > 0;
+    }
+    
+    // Public methods to access private data
+    public void deposit(double amount) {
+        if (validateAmount(amount)) {  // Calling private method within same class ✅
+            balance += amount;
+            System.out.println("Deposited: $" + amount);
+        }
+    }
+    
+    public double getBalance() {
+        return balance;  // Accessing private variable within same class ✅
+    }
+}
+
+class BankTest {
+    public static void main(String[] args) {
+        BankAccount account = new BankAccount("12345", 1000.0);
+        
+        account.deposit(500);           // ✅ Public method - accessible
+        System.out.println("Balance: $" + account.getBalance()); // ✅ Public method
+        
+        // account.balance = 5000;      // ❌ ERROR: balance is private
+        // account.validateAmount(100); // ❌ ERROR: validateAmount is private
+    }
+}
+```
+
+#### 2️⃣ Default Access Modifier (Package-Private)
+```java
+// File: com/example/DefaultExample.java
+package com.example;
+
+class DefaultExample {
+    String name;              // Default access - no modifier specified
+    int age;                  // Default access
+    
+    void displayInfo() {      // Default access method
+        System.out.println("Name: " + name + ", Age: " + age);
+    }
+}
+
+class SamePackageClass {
+    public static void main(String[] args) {
+        DefaultExample obj = new DefaultExample();
+        
+        obj.name = "John";        // ✅ Accessible - same package
+        obj.age = 25;             // ✅ Accessible - same package
+        obj.displayInfo();        // ✅ Accessible - same package
+    }
+}
+```
+
+```java
+// File: com/different/DifferentPackageClass.java
+package com.different;  // Different package
+
+import com.example.DefaultExample;
+
+class DifferentPackageClass {
+    public static void main(String[] args) {
+        DefaultExample obj = new DefaultExample();
+        
+        // obj.name = "John";     // ❌ ERROR: not accessible from different package
+        // obj.age = 25;          // ❌ ERROR: not accessible from different package
+        // obj.displayInfo();     // ❌ ERROR: not accessible from different package
+    }
+}
+```
+
+#### 3️⃣ Protected Access Modifier
+```java
+// File: com/example/Vehicle.java
+package com.example;
+
+public class Vehicle {
+    protected String brand;        // Protected - accessible in package + subclasses
+    protected int year;
+    
+    protected void startEngine() { // Protected method
+        System.out.println("Vehicle engine started");
+    }
+}
+```
+
+```java
+// File: com/example/Car.java (Same package)
+package com.example;
+
+class Car extends Vehicle {
+    public void carMethod() {
+        brand = "Toyota";      // ✅ Accessible - same package
+        year = 2023;           // ✅ Accessible - same package
+        startEngine();         // ✅ Accessible - same package
+    }
+}
+
+class TestProtected {
+    public static void main(String[] args) {
+        Vehicle vehicle = new Vehicle();
+        vehicle.brand = "Honda";    // ✅ Accessible - same package
+        vehicle.startEngine();      // ✅ Accessible - same package
+    }
+}
+```
+
+```java
+// File: com/different/Bike.java (Different package)
+package com.different;
+
+import com.example.Vehicle;
+
+class Bike extends Vehicle {     // Subclass in different package
+    public void bikeMethod() {
+        brand = "Yamaha";        // ✅ Accessible - subclass (inheritance)
+        year = 2022;             // ✅ Accessible - subclass
+        startEngine();           // ✅ Accessible - subclass
+    }
+}
+
+class TestProtectedDifferent {
+    public static void main(String[] args) {
+        Vehicle vehicle = new Vehicle();
+        // vehicle.brand = "Honda";    // ❌ ERROR: not accessible from different package
+        // vehicle.startEngine();      // ❌ ERROR: not accessible from different package
+        
+        Bike bike = new Bike();
+        bike.bikeMethod();             // ✅ This works because it's inside subclass
+    }
+}
+```
+
+#### 4️⃣ Public Access Modifier
+```java
+// File: com/example/PublicExample.java
+package com.example;
+
+public class PublicExample {
+    public String message;         // Public - accessible everywhere
+    public int number;
+    
+    public void showMessage() {    // Public method - accessible everywhere
+        System.out.println("Message: " + message);
+    }
+}
+```
+
+```java
+// File: com/anywhere/AnyClass.java
+package com.anywhere;  // Completely different package
+
+import com.example.PublicExample;
+
+class AnyClass {
+    public static void main(String[] args) {
+        PublicExample obj = new PublicExample();
+        
+        obj.message = "Hello from anywhere!";  // ✅ Public - accessible everywhere
+        obj.number = 100;                      // ✅ Public - accessible everywhere
+        obj.showMessage();                     // ✅ Public - accessible everywhere
+    }
+}
+```
+
+### 🔒 Encapsulation
+
+**What is Encapsulation?**
+Encapsulation means bundling data (variables) and methods together and hiding internal implementation details from the outside world.
+
+Real-world analogy: A medicine capsule - the medicine (data) is safely enclosed inside the capsule, and you can only access it through proper means (methods).
+
+**Why Encapsulation?**
+- **Data Security:** Protect data from unauthorized access
+- **Data Integrity:** Ensure data is modified correctly
+- **Maintainability:** Change internal implementation without affecting external code
+- **Flexibility:** Add validation and business logic
+
+#### 🔧 How to Implement Encapsulation:
+**Step 1:** Make Variables Private
+**Step 2:** Provide Public Getter/Setter Methods
+
+```java
+class Student {
+    // Private variables - cannot be accessed directly from outside
+    private String name;
+    private int age;
+    private double gpa;
+    private String email;
+    
+    // Constructor
+    public Student(String name, int age, double gpa, String email) {
+        this.name = name;
+        this.age = age;
+        this.gpa = gpa;
+        this.email = email;
+    }
+    
+    // ========== GETTER METHODS (Read access) ==========
+    
+    public String getName() {
+        return name;
+    }
+    
+    public int getAge() {
+        return age;
+    }
+    
+    public double getGpa() {
+        return gpa;
+    }
+    
+    public String getEmail() {
+        return email;
+    }
+    
+    // ========== SETTER METHODS (Write access with validation) ==========
+    
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        } else {
+            System.out.println("Error: Name cannot be empty");
+        }
+    }
+    
+    public void setAge(int age) {
+        if (age >= 16 && age <= 100) {
+            this.age = age;
+        } else {
+            System.out.println("Error: Age must be between 16 and 100");
+        }
+    }
+    
+    public void setGpa(double gpa) {
+        if (gpa >= 0.0 && gpa <= 4.0) {
+            this.gpa = gpa;
+        } else {
+            System.out.println("Error: GPA must be between 0.0 and 4.0");
+        }
+    }
+    
+    public void setEmail(String email) {
+        if (email != null && email.contains("@")) {
+            this.email = email;
+        } else {
+            System.out.println("Error: Invalid email format");
+        }
+    }
+    
+    // ========== OTHER METHODS ==========
+    
+    public void displayInfo() {
+        System.out.println("=== Student Info ===");
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("GPA: " + gpa);
+        System.out.println("Email: " + email);
+        System.out.println("===================");
+    }
+    
+    // Method to calculate grade based on GPA
+    public String getGrade() {
+        if (gpa >= 3.7) return "A";
+        else if (gpa >= 3.3) return "B+";
+        else if (gpa >= 3.0) return "B";
+        else if (gpa >= 2.7) return "C+";
+        else if (gpa >= 2.0) return "C";
+        else return "F";
+    }
+}
+
+class EncapsulationDemo {
+    public static void main(String[] args) {
+        // Creating student with valid data
+        Student student1 = new Student("Alice Johnson", 20, 3.8, "alice@email.com");
+        student1.displayInfo();
+        
+        System.out.println("Grade: " + student1.getGrade());
+        System.out.println();
+        
+        // ========== DEMONSTRATING ENCAPSULATION BENEFITS ==========
+        
+        System.out.println("=== Testing Data Validation ===");
+        
+        // Valid updates
+        student1.setAge(21);           // Valid age
+        student1.setGpa(3.9);          // Valid GPA
+        System.out.println("After valid updates:");
+        student1.displayInfo();
+        
+        System.out.println();
+        
+        // Invalid updates - encapsulation protects data
+        student1.setAge(150);          // Invalid age - rejected
+        student1.setGpa(5.0);          // Invalid GPA - rejected
+        student1.setEmail("invalidemail"); // Invalid email - rejected
+        student1.setName("");          // Empty name - rejected
+        
+        System.out.println("After invalid updates (data unchanged):");
+        student1.displayInfo();
+        
+        // ========== WITHOUT ENCAPSULATION (BAD EXAMPLE) ==========
+        System.out.println("\n=== What happens WITHOUT encapsulation ===");
+        
+        NonEncapsulatedStudent badStudent = new NonEncapsulatedStudent();
+        badStudent.name = "";          // ❌ Can set empty name
+        badStudent.age = -5;           // ❌ Can set negative age
+        badStudent.gpa = 10.0;         // ❌ Can set invalid GPA
+        badStudent.email = "notanemail"; // ❌ Can set invalid email
+        
+        System.out.println("Bad student data:");
+        badStudent.displayInfo();     // Shows invalid data!
+    }
+}
+
+// Example of NON-encapsulated class (BAD PRACTICE)
+class NonEncapsulatedStudent {
+    public String name;    // Public - can be accessed directly
+    public int age;        // No validation possible
+    public double gpa;     // Anyone can set invalid values
+    public String email;
+    
+    public void displayInfo() {
+        System.out.println("Name: " + name + ", Age: " + age + 
+                          ", GPA: " + gpa + ", Email: " + email);
+    }
+}
+```
+
+### 🏛️ Complete Access Modifier Examples
+
+**Real-World Scenario: Banking System**
+```java
+// File: com/bank/core/Account.java
+package com.bank.core;
+
+public class Account {
+    // Private - only accessible within this class
+    private double balance;
+    private String accountNumber;
+    private String pin;
+    
+    // Protected - accessible in package + subclasses
+    protected String accountType;
+    protected String customerName;
+    
+    // Default (package-private) - accessible within same package
+    String branchCode;
+    String ifscCode;
+    
+    // Public - accessible everywhere
+    public String bankName;
+    
+    public Account(String accountNumber, String customerName, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.customerName = customerName;
+        this.balance = initialBalance;
+        this.bankName = "ABC Bank";
+        this.branchCode = "BR001";
+        this.ifscCode = "ABC0001234";
+        this.accountType = "Savings";
+    }
+    
+    // Private method - internal validation
+    private boolean validatePin(String inputPin) {
+        return pin != null && pin.equals(inputPin);
+    }
+    
+    // Protected method - accessible to subclasses
+    protected void updateAccountType(String newType) {
+        accountType = newType;
+        System.out.println("Account type updated to: " + newType);
+    }
+    
+    // Default method - accessible within package
+    void processInterest() {
+        balance += balance * 0.03; // 3% interest
+        System.out.println("Interest processed. New balance: $" + balance);
+    }
+    
+    // Public methods - accessible everywhere
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Deposited: $" + amount + ". Balance: $" + balance);
+        }
+    }
+    
+    public boolean withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println("Withdrawn: $" + amount + ". Balance: $" + balance);
+            return true;
+        } else {
+            System.out.println("Invalid withdrawal amount");
+            return false;
+        }
+    }
+    
+    public double getBalance() {
+        return balance;
+    }
+    
+    public void displayAccountInfo() {
+        System.out.println("=== Account Information ===");
+        System.out.println("Bank: " + bankName);
+        System.out.println("Customer: " + customerName);
+        System.out.println("Account Type: " + accountType);
+        System.out.println("Branch: " + branchCode);
+        System.out.println("IFSC: " + ifscCode);
+        System.out.println("Balance: $" + balance);
+        System.out.println("==========================");
+    }
+}
+```
+
+**Same Package Access Example:**
+```java
+// File: com/bank/core/BankManager.java
+package com.bank.core;  // SAME PACKAGE
+
+class BankManager {
+    public static void main(String[] args) {
+        Account account = new Account("ACC001", "John Doe", 5000.0);
+        
+        // ✅ Public access
+        account.bankName = "XYZ Bank";
+        account.deposit(1000);
+        
+        // ✅ Protected access (same package)
+        account.customerName = "John Smith";
+        account.updateAccountType("Current");
+        
+        // ✅ Default access (same package)
+        account.branchCode = "BR002";
+        account.processInterest();
+        
+        // ❌ Private access - NOT accessible
+        // account.balance = 10000;      // ERROR
+        // account.validatePin("1234");  // ERROR
+        
+        account.displayAccountInfo();
+    }
+}
+```
+
+**Different Package Access Example:**
+```java
+// File: com/bank/external/ExternalTest.java
+package com.bank.external;  // DIFFERENT PACKAGE
+
+import com.bank.core.Account;
+
+class ExternalTest {
+    public static void main(String[] args) {
+        Account account = new Account("ACC002", "Jane Doe", 3000.0);
+        
+        // ✅ Public access - accessible everywhere
+        account.bankName = "Global Bank";
+        account.deposit(500);
+        account.displayAccountInfo();
+        
+        // ❌ Protected access - NOT accessible (different package, not subclass)
+        // account.customerName = "Jane Smith";  // ERROR
+        // account.updateAccountType("Fixed");   // ERROR
+        
+        // ❌ Default access - NOT accessible (different package)
+        // account.branchCode = "BR003";         // ERROR
+        // account.processInterest();            // ERROR
+        
+        // ❌ Private access - NOT accessible
+        // account.balance = 10000;              // ERROR
+    }
+}
+```
+
+**Subclass in Different Package:**
+```java
+// File: com/bank/premium/PremiumAccount.java
+package com.bank.premium;  // DIFFERENT PACKAGE
+
+import com.bank.core.Account;
+
+class PremiumAccount extends Account {  // Subclass
+    private double creditLimit;
+    
+    public PremiumAccount(String accountNumber, String customerName, 
+                         double initialBalance, double creditLimit) {
+        super(accountNumber, customerName, initialBalance);
+        this.creditLimit = creditLimit;
+    }
+    
+    public void premiumFeatures() {
+        // ✅ Public access - accessible everywhere
+        bankName = "Premium Bank";
+        
+        // ✅ Protected access - accessible in subclass
+        customerName = "VIP " + customerName;
+        updateAccountType("Premium");
+        
+        // ❌ Default access - NOT accessible (different package, even if subclass)
+        // branchCode = "PR001";         // ERROR
+        // processInterest();            // ERROR
+        
+        // ❌ Private access - NOT accessible
+        // balance = 50000;              // ERROR
+        
+        System.out.println("Premium account features activated for: " + customerName);
+    }
+}
+```
+
+### 📊 Access Modifiers Summary Table
+
+| Access Level | private | default | protected | public |
+|--------------|---------|---------|-----------|--------|
+| Same Class   |   ✅    |   ✅    |   ✅    |   ✅    |
+| Same Package |   ❌    |   ✅    |   ✅    |   ✅    |
+| Subclass (Different Package) |   ❌    |   ❌    |   ✅    |   ✅    |
+| Different Package |   ❌    |   ❌    |   ❌    |   ✅    |
+
+### 🎯 Best Practices
+
+**For Packages:**
+- Use reverse domain naming (com.company.project)
+- Keep related classes together
+- Use meaningful package names
+- Avoid deep nesting (max 4-5 levels)
+
+**For Access Modifiers:**
+- Default choice: Make everything private
+- Use public only when needed for external access
+- Use protected for inheritance-related features
+- Use default for package-internal collaboration
+
+**For Encapsulation:**
+- Always make variables private
+- Provide public getters/setters with validation
+- Hide complex implementation details
+- Expose only necessary functionality
+
+### 💡 Quick Tips
+- **Packages** help organize code - like folders for files
+- **Access modifiers** control visibility - who can see what
+- **Encapsulation** protects data - controlled access through methods
+- Start restrictive, then open up - begin with private, make public only if needed
+- **Validation in setters** - always check data before storing
+
+These concepts work together to create secure, maintainable, and well-organized Java applications!
+
+---
+
+## Inheritance, Abstraction & Interfaces - Complete Guide
+
+### 🧬 Inheritance
+
+**What is Inheritance?**
+Inheritance is a mechanism where a new class (child/subclass) acquires properties and methods of an existing class (parent/superclass). It promotes code reusability and establishes an "IS-A" relationship.
+
+#### Types of Inheritance in Java
+- **Single Inheritance** - One class extends another class
+- **Multilevel Inheritance** - A chain of inheritance (A → B → C)
+- **Hierarchical Inheritance** - Multiple classes inherit from one parent
+
+#### Key Keywords
+- **extends** - Used for class inheritance
+- **super** - Refers to parent class
+- **this** - Refers to current class instance
+
+#### Example
+```java
+// Parent class
+class Animal {
+    protected String name;
+    
+    public void eat() {
+        System.out.println("Animal is eating");
+    }
+}
+
+// Child class
+class Dog extends Animal {
+    public void bark() {
+        System.out.println("Dog is barking");
+    }
+    
+    @Override
+    public void eat() {
+        System.out.println("Dog is eating");
+    }
+}
+```
+
+### 💎 Why Java Doesn't Support Multiple Inheritance?
+
+#### The Diamond Problem
+Java doesn't support multiple inheritance of classes to avoid the Diamond Problem.
+
+**Problem Scenario:**
+```
+    Class A
+   /        \
+Class B    Class C
+   \        /
+    Class D
+```
+
+If both B and C override a method from A, and D inherits from both B and C, which version should D inherit? This creates ambiguity.
+
+#### Java's Solution
+- **Single Inheritance** for classes
+- **Multiple Inheritance** through interfaces (since Java 8 with default methods)
+- Interfaces can have default methods, but if conflicts arise, the implementing class must override the method
+
+#### Example of Diamond Problem Solution
+```java
+interface A {
+    default void show() {
+        System.out.println("A");
+    }
+}
+
+interface B extends A {
+    default void show() {
+        System.out.println("B");
+    }
+}
+
+interface C extends A {
+    default void show() {
+        System.out.println("C");
+    }
+}
+
+class D implements B, C {
+    // MUST override to resolve conflict
+    @Override
+    public void show() {
+        B.super.show(); // Or choose C.super.show()
+    }
+}
+```
+
+### 🎭 Abstraction
+
+**What is Abstraction?**
+Abstraction hides implementation details and shows only essential features to the user. It focuses on "what" an object does rather than "how" it does it.
+
+#### Ways to Achieve Abstraction
+- **Abstract Classes** (0-100% abstraction)
+- **Interfaces** (100% abstraction until Java 8, now can have default methods)
+
+#### Abstract Classes
+- Cannot be instantiated
+- Can have both abstract and concrete methods
+- Can have constructors, instance variables
+- Use `abstract` keyword
+
+```java
+abstract class Shape {
+    protected String color;
+    
+    // Abstract method - must be implemented by subclasses
+    abstract double calculateArea();
+    
+    // Concrete method
+    public void setColor(String color) {
+        this.color = color;
+    }
+}
+
+class Circle extends Shape {
+    private double radius;
+    
+    Circle(double radius) {
+        this.radius = radius;
+    }
+    
+    @Override
+    double calculateArea() {
+        return Math.PI * radius * radius;
+    }
+}
+```
+
+#### Key Points About Abstract Classes
+- Can have 0 to n abstract methods
+- If a class has even one abstract method, it must be declared abstract
+- Subclasses must implement all abstract methods (unless they're also abstract)
+- Can have constructors (called via `super()`)
+
+### 🔌 Interfaces
+
+**What are Interfaces?**
+Interfaces define a contract that implementing classes must follow. They specify what methods a class must implement but not how.
+
+#### Interface Evolution in Java
+
+**Before Java 8:**
+- Only abstract methods and constants
+- 100% abstraction
+- All methods implicitly `public abstract`
+- All variables implicitly `public static final`
+
+**Java 8 and Later:**
+- **Default methods** - provide implementation
+- **Static methods** - belong to interface, not implementing class
+
+**Java 9+:**
+- **Private methods** - for code reuse within interface
+
+#### Interface Example
+```java
+interface Drawable {
+    // Constant (implicitly public static final)
+    int MAX_SIZE = 100;
+    
+    // Abstract method (implicitly public abstract)
+    void draw();
+    
+    // Default method (Java 8+)
+    default void resize() {
+        System.out.println("Resizing...");
+    }
+    
+    // Static method (Java 8+)
+    static void printInfo() {
+        System.out.println("This is Drawable interface");
+    }
+    
+    // Private method (Java 9+)
+    private void helper() {
+        System.out.println("Helper method");
+    }
+}
+
+class Rectangle implements Drawable {
+    @Override
+    public void draw() {
+        System.out.println("Drawing rectangle");
+    }
+}
+```
+
+### ⚖️ Abstract Class vs Interface
+
+| Aspect | Abstract Class | Interface |
+|--------|----------------|-----------|
+| **Keyword** | `abstract class` | `interface` |
+| **Methods** | Abstract + Concrete | Abstract + Default + Static + Private |
+| **Variables** | Any type | Only `public static final` |
+| **Inheritance** | Single inheritance | Multiple inheritance |
+| **Constructor** | Can have | Cannot have |
+| **Access Modifiers** | Any | Methods are public by default |
+| **When to Use** | IS-A relationship, shared code | CAN-DO relationship, contract |
+
+#### When to Use What?
+- **Abstract Class:** When you have closely related classes sharing common code
+- **Interface:** When you want to specify a contract that unrelated classes can implement
+
+### 🎯 Common Interview Questions & Answers
+
+**Q1: Can an abstract class have a constructor?**
+**Answer:** Yes, abstract classes can have constructors. They're called when a subclass is instantiated using `super()`.
+
+**Q2: Can we instantiate an abstract class?**
+**Answer:** No, you cannot directly instantiate an abstract class using `new`. However, you can create anonymous inner classes.
+
+**Q3: Can an interface extend multiple interfaces?**
+**Answer:** Yes, interfaces can extend multiple interfaces using `extends`.
+```java
+interface A { }
+interface B { }
+interface C extends A, B { }
+```
+
+**Q4: What happens if a class implements two interfaces with the same default method?**
+**Answer:** The class must override the method to resolve the conflict.
+
+**Q5: Can we have main method in abstract class?**
+**Answer:** Yes, abstract classes can have main methods and can be executed.
+
+**Q6: What is marker interface?**
+**Answer:** An interface with no methods, used to mark classes with special behavior (e.g., `Serializable`, `Cloneable`).
+
+**Q7: Can interface have constructor?**
+**Answer:** No, interfaces cannot have constructors because they cannot be instantiated.
+
+**Q8: What is functional interface?**
+**Answer:** An interface with exactly one abstract method. Can be used with lambda expressions (e.g., `Runnable`, `Comparator`).
+
+**Q9: Difference between method overriding and method hiding?**
+**Answer:**
+- **Overriding:** Instance methods in subclass override parent methods
+- **Hiding:** Static methods in subclass hide parent static methods
+
+**Q10: Can we override static methods?**
+**Answer:** No, static methods cannot be overridden, only hidden.
+
+### 🚀 Advanced Concepts
+
+#### Method Resolution in Inheritance
+- **Method Overriding:** Runtime polymorphism - actual method called depends on object type
+- **Method Hiding:** Compile-time resolution - method called depends on reference type
+
+#### Super Keyword Usage
+```java
+class Parent {
+    int x = 10;
+    
+    Parent() {
+        System.out.println("Parent constructor");
+    }
+    
+    void display() {
+        System.out.println("Parent display");
+    }
+}
+
+class Child extends Parent {
+    int x = 20;
+    
+    Child() {
+        super(); // Call parent constructor
+        System.out.println("Child constructor");
+    }
+    
+    void display() {
+        super.display(); // Call parent method
+        System.out.println("Child display");
+        System.out.println("Parent x: " + super.x); // Access parent variable
+        System.out.println("Child x: " + this.x);
+    }
+}
+```
+
+#### Final Keyword with Inheritance
+- **final class:** Cannot be inherited (e.g., `String`, `Integer`)
+- **final method:** Cannot be overridden
+- **final variable:** Cannot be reassigned
+
+### 📋 Best Practices
+
+#### Inheritance Best Practices
+- Favor composition over inheritance when possible
+- Use inheritance for IS-A relationships
+- Keep inheritance hierarchies shallow
+- Document the inheritance contract clearly
+
+#### Interface Best Practices
+- Keep interfaces focused and cohesive
+- Use functional interfaces for single-method contracts
+- Prefer interfaces over abstract classes for contracts
+- Use default methods judiciously
+
+#### Abstract Class Best Practices
+- Provide common implementation in abstract classes
+- Use abstract classes when you need constructors
+- Don't make everything abstract - provide useful concrete methods
+
+### 💻 Coding Interview Patterns
+
+#### Common Scenarios
+- **Shape hierarchy** - Abstract Shape class with concrete Circle, Rectangle
+- **Vehicle hierarchy** - Demonstrating inheritance and polymorphism
+- **Interface segregation** - Breaking large interfaces into smaller ones
+- **Strategy pattern** - Using interfaces for different algorithms
+
+#### Sample Interview Code
+```java
+// Demonstrate all concepts together
+abstract class Vehicle {
+    protected String brand;
+    
+    Vehicle(String brand) {
+        this.brand = brand;
+    }
+    
+    abstract void start();
+    
+    public void stop() {
+        System.out.println("Vehicle stopped");
+    }
+}
+
+interface Electric {
+    void charge();
+    
+    default void batteryStatus() {
+        System.out.println("Checking battery...");
+    }
+}
+
+interface GPS {
+    void navigate(String destination);
+}
+
+class Tesla extends Vehicle implements Electric, GPS {
+    Tesla() {
+        super("Tesla");
+    }
+    
+    @Override
+    void start() {
+        System.out.println("Tesla started silently");
+    }
+    
+    @Override
+    public void charge() {
+        System.out.println("Charging Tesla");
+    }
+    
+    @Override
+    public void navigate(String destination) {
+        System.out.println("Navigating to: " + destination);
+    }
+}
+```
+
+### ✅ Quick Reference Checklist
+
+#### Before Interview - Key Points to Remember
+✅ Java supports single inheritance for classes, multiple for interfaces  
+✅ Abstract classes can have constructors, interfaces cannot  
+✅ Interfaces can have default, static, and private methods (Java 8+)  
+✅ Diamond problem and how Java solves it  
+✅ `super` vs `this` keyword usage  
+✅ Method overriding vs method hiding  
+✅ When to use abstract class vs interface  
+✅ `final` keyword implications on inheritance  
+✅ Marker interfaces and functional interfaces  
+✅ Interface default method conflict resolution  
+
+#### Common Traps in Interviews
+- Assuming interfaces can't have method implementations (outdated knowledge)
+- Confusing method overriding with method hiding
+- Not knowing about interface private methods (Java 9+)
+- Mixing up IS-A vs HAS-A relationships
+- Forgetting that abstract classes can have concrete methods
+
+---------------------------------------------------------------------
