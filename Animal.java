@@ -1,9 +1,11 @@
 public class Animal {
-    void eating(){
+   void eating(){
         System.out.println("Animal is eating");
     }
      void sound(){
+
         System.out.println("Animal is making sound");
+
     }
 
 }
